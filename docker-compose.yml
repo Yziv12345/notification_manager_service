@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  notification-manager:
+    build:
+      context: .  # Assuming your Dockerfile is in this directory
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+      - notification-service  # Ensure it waits for notification service
+    command: ["wait-for-it", "notification-service:5001", "--", "npm", "start"]  # Wait for notification service
+    environment:
+      - PORT=8080
+      - MONGO_URI=mongodb://mongo:27017/notification_service
+    networks:
+      - notif-net
+
+  notification-service:
+    image: aryekog/backend-interview-notifications-service:0.0.2
+    ports:
+      - "5001:5001"
+    environment:
+      - EMAIL_RATE_LIMIT=1
+      - SMS_RATE_LIMIT=1
+      - RATE_LIMIT_WINDOW_MS=1000
+      - ERROR_RATE=0.1
+    networks:
+      - notif-net
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - notif-net
+
+volumes:
+  mongo-data:
+
+networks:
+  notif-net:
