@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  notification-manager:
+    build:
+      context: ./notification-manager
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    environment:
+      - PORT=8080
+      - MONGO_URI=mongodb://mongo:27017/notification_service
+    networks:
+      - notif-net
+
+  notification-service:
+    image: aryekog/backend-interview-notifications-service:0.0.2
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mongo
+    environment:
+      - EMAIL_RATE_LIMIT=1
+      - SMS_RATE_LIMIT=1
+      - RATE_LIMIT_WINDOW_MS=1000
+      - ERROR_RATE=0.1
+      - MONGO_URI=mongodb://mongo:27017/notification_service
+    networks:
+      - notif-net
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - notif-net
+
+volumes:
+  mongo-data:
+
+networks:
+  notif-net:
