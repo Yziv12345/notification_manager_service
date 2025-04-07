@@ -21,6 +21,7 @@ It consists of:
   - Alternatively, user data could be persisted in a separate **MongoDB collection** or **SQL database** (like PostgreSQL).
 - Rate-limiting and error tracking logic is designed with **Redis-style caching** in mind.
 - Error and rate limit tracking is decoupled and extensible.
+- Email or phone are uniq and can role as id's 
 
 ---
 
